@@ -860,7 +860,7 @@ class Parameters(StateManager):
         Returns a boolean indicating whether the provided parameter
         is contained within the set of parameters.
         """
-        return name in self.get_names()
+        return name in self.params
 
     def __getitem__(self, name:str) -> Number:
         """
