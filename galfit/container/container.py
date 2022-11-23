@@ -67,7 +67,7 @@ class Container(StateManager):
         Iterates through the items found in the container and
         yields the set of Parameter objects.
     """
-    def __init__(self, **functions:Dict[str, Union[Container,Function]]):
+    def __init__(self, **functions:Dict[str, StateManager]):
         """
         Stores the specified key-Function pairs within the
         container object.
@@ -80,7 +80,7 @@ class Container(StateManager):
         """
         self.container = functions
 
-    def __getitem__(self, name:str) -> Union[Container, Function]:
+    def __getitem__(self, name:str) -> StateManager:
         """
         Returns the associated function in container with the
         indicated key.
