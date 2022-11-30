@@ -136,6 +136,11 @@ class TestParameters(unittest.TestCase):
         self.assertTrue("a" in p)
         self.assertFalse("b" in p)
 
+    def test_duplicate(self):
+        a = Parameter(name="a", value=1)
+        p = Parameters(a=a, b=a)
+        self.assertEqual(p.values, [1])
+
     def test_getitem(self):
         p = Parameters()
         p.add(name="a", value=1)        

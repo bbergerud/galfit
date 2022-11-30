@@ -150,8 +150,10 @@ class StateManager:
     def get_params(self) -> List[Parameter]:
         """
         Returns a list of the parameter objects that are not expressions.
+        Any duplicated parameters are dropped.
         """
-        params = flatten([x for x in self], Parameter)
+        # Dictionary will remove possible duplicate cases (shared parameters)
+        params = tuple(dict.fromkeys(flatten([x for x in self], Parameter)))
         return [p for p in params if not p.is_expr]
 
     def get_fixed_params(self) -> List[Parameter]:
