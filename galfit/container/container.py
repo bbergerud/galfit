@@ -4,6 +4,10 @@ and routines that combine multiple functions.
 
 Classes
 -------
+AddMulBase
+    Base class for defining __add__ and __mul__ methods for
+    joining functions. Meant to be inherited by child classes.
+
 Container(**functions)
     A base class that is used for joining multiple functions.
     The functions are stored within a container dictionary.
@@ -42,6 +46,23 @@ from __future__ import annotations  # Allow same typing
 from dataops.utils import flatten
 from typing import Dict, Union
 from ..parameter import StateManager, Parameter
+
+class AddMulBase(StateManager):
+    """
+    Base class for defining __add__ and __mul__ methods for
+    joining functions. Meant to be inherited by child classes.
+    """
+    def __add__(self, other:StateManager) -> FunctionAdd:
+        """Constructs a function addition"""
+        return FunctionAdd(self, other)
+
+    def __mul__(self, inner:Function) -> FunctionComposition:
+        """Constructs a function composition"""
+        return FunctionComposition(inner=inner, outer=self)
+
+    def __radd__(self, other):
+        """Removes integer from python's sum() operation"""
+        return self
 
 class Container(StateManager):
     """
@@ -92,7 +113,7 @@ class Container(StateManager):
         for x in flatten(self.container.values(), Parameter):
             yield x
 
-class Function(StateManager):
+class Function(AddMulBase):
     """
     Base Function class for working with function-like objects whose
     parameters are contained in a single Parameters object. Designed
@@ -156,10 +177,6 @@ class Function(StateManager):
     )
     func()
     """
-    def __add__(self, other:Function) -> FunctionAdd:
-        """Constructs a function addition"""
-        return FunctionAdd(self, other)
-
     def __contains__(self, key:str):
         """Checks to see if the indicated key is found in state dictionary"""
         return key in self.state
@@ -179,11 +196,7 @@ class Function(StateManager):
         """Iterates through the Parameter objects"""
         return iter(self.state)
 
-    def __mul__(self, inner:Function) -> FunctionComposition:
-        """Constructs a function composition"""
-        return FunctionComposition(inner=inner, outer=self)
-
-class FunctionAdd(Container):
+class FunctionAdd(Container, AddMulBase):
     """
     Module for merging two functions by adding their outputs together.
     Useful if they contain a set of inputs that are shared between them.
@@ -247,7 +260,7 @@ class FunctionAdd(Container):
         else:
             return out1 + out2
 
-class FunctionComposition(Container):
+class FunctionComposition(Container, AddMulBase):
     """
     Method for creating a composition of two functions.
     Useful if the outputs of one function serve as the
